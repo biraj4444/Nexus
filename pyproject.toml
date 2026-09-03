@@ -6,6 +6,10 @@ requires-python = ">=3.13"
 dependencies = [
     "flask",
     "werkzeug",
+    "pymongo",
+    "cloudinary",
+    "python-dotenv",
+    "requests",
 ]
 
 [dependency-groups]
@@ -13,4 +17,3 @@ dev = [
     "workers-py",
     "workers-runtime-sdk",
 ]
-
