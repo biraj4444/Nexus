@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "nexusvault",
+  "name": "nexus",
   "main": "src/worker.py",
   "compatibility_date": "2026-09-03",
   "compatibility_flags": ["python_workers"]
