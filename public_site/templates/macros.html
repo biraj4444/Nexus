@@ -1,0 +1,174 @@
+{# ─── item_card macro ──────────────────────────────────────────────────────
+   video / image  →  big grid card  (16:9 thumb)
+   link           →  slim horizontal row (redirect on click)
+   file           →  slim horizontal row (download on click)
+#}
+
+{# ── helper: category accent colour ── #}
+{% macro cat_color(slug) %}{% if slug=='official' %}#1a73e8{% elif slug=='technology' %}#00bcd4{% elif slug=='entertainment' %}#e91e63{% elif slug=='education' %}#4caf50{% elif slug=='tools' %}#ff5722{% elif slug=='events' %}#9c27b0{% elif slug=='news' %}#607d8b{% elif slug=='downloads' %}#795548{% elif slug=='high-demand' %}#ff6b00{% else %}#34a853{% endif %}{% endmacro %}
+
+{# ── file extension → icon ── #}
+{% macro file_icon(url, fmt) %}
+  {% set ext = (url or fmt or '').lower().split('.')[-1] %}
+  {% if ext in ['pdf'] %}📕
+  {% elif ext in ['zip','rar','7z','tar','gz'] %}🗜️
+  {% elif ext in ['mp3','wav','aac','flac','ogg'] %}🎵
+  {% elif ext in ['doc','docx'] %}📝
+  {% elif ext in ['xls','xlsx','csv'] %}📊
+  {% elif ext in ['ppt','pptx'] %}📑
+  {% elif ext in ['exe','apk','dmg'] %}⚙️
+  {% elif ext in ['py','js','html','css','json','sh'] %}💻
+  {% elif ext in ['iso','img'] %}💿
+  {% else %}📄{% endif %}
+{% endmacro %}
+
+{# ── MAIN macro ── #}
+{% macro item_card(item) %}
+
+{# ════════════════════════════════
+   LINK  →  slim horizontal row
+════════════════════════════════ #}
+{% if item.type == 'link' %}
+{% set accent = cat_color(item.category_slug) %}
+<a class="link-row" href="{{ item.url or '/item/' + item._id }}"
+   target="_blank" rel="noopener"
+   title="{{ item.title }}{% if item.description %} — {{ item.description[:100] }}{% endif %}">
+
+  {# left: tiny cover image or colour strip #}
+  <div class="link-row-cover" style="
+    background: {% if item.thumbnail_url %}#000{% else %}{{ accent }}{% endif %};
+    border-left: 3px solid {{ accent }};
+  ">
+    {% if item.thumbnail_url %}
+    <img src="{{ item.thumbnail_url }}" alt="" loading="lazy">
+    {% else %}
+    <span class="link-row-icon">🔗</span>
+    {% endif %}
+  </div>
+
+  {# middle: text #}
+  <div class="link-row-body">
+    <span class="link-row-title">{{ item.title }}</span>
+    <span class="link-row-meta">
+      <span class="link-row-domain">{{ item.url|replace('https://','',1)|replace('http://','',1)|truncate(38, True, '') if item.url else '' }}</span>
+      <span class="link-row-cat" style="background:{{ accent }};">{{ item.category_slug|replace('-',' ')|title }}</span>
+      {% if item.is_featured %}<span class="link-row-feat">★</span>{% endif %}
+    </span>
+  </div>
+
+  {# right: redirect arrow #}
+  <div class="link-row-action">
+    <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  </div>
+</a>
+
+{# ════════════════════════════════
+   FILE  →  slim horizontal row
+════════════════════════════════ #}
+{% elif item.type == 'file' %}
+{% set accent = cat_color(item.category_slug) %}
+{% set ext = (item.url or item.cloudinary_url or '').lower().split('.')[-1] %}
+<div class="file-row">
+
+  {# left: file type icon #}
+  <div class="file-row-icon-wrap" style="background:{{ accent }}15;border-left:3px solid {{ accent }};">
+    <span class="file-row-icon">{{ file_icon(item.url, item.extra_details.get('format','') if item.extra_details else '') }}</span>
+    {% if ext and ext|length <= 4 and ext.isalpha() %}
+    <span class="file-row-ext">{{ ext|upper }}</span>
+    {% endif %}
+  </div>
+
+  {# middle: name + meta #}
+  <div class="file-row-body">
+    <a class="file-row-title" href="/item/{{ item._id }}">{{ item.title }}</a>
+    <span class="file-row-meta">
+      {% if item.extra_details and item.extra_details.get('size') %}
+      <span>{{ item.extra_details.size }}</span>
+      {% endif %}
+      <span class="file-row-cat" style="background:{{ accent }};">{{ item.category_slug|replace('-',' ')|title }}</span>
+      <span class="text-muted text-small">⬇ {{ item.downloads or 0 }}</span>
+      {% if item.is_featured %}<span class="link-row-feat">★</span>{% endif %}
+    </span>
+  </div>
+
+  {# right: download button #}
+  <a class="file-row-dl" href="/download/{{ item._id }}" title="Download">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  </a>
+</div>
+
+{# ════════════════════════════════
+   VIDEO / IMAGE  →  big grid card
+════════════════════════════════ #}
+{% else %}
+{% set type_icons = {'video': '🎬', 'image': '🖼️'} %}
+{% set accent = cat_color(item.category_slug) %}
+<div class="card">
+  <a href="/item/{{ item._id }}" class="card-thumb">
+    {% if item.thumbnail_url %}
+    <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}" loading="lazy">
+    {% else %}
+    <div class="card-thumb-placeholder">{{ type_icons.get(item.type, '📦') }}</div>
+    {% endif %}
+    <span class="card-type-badge type-{{ item.type }}">{{ item.type }}</span>
+    {% if item.is_featured %}
+    <span style="position:absolute;bottom:6px;right:6px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;text-transform:uppercase;letter-spacing:.5px;">★ Featured</span>
+    {% endif %}
+  </a>
+  <div class="card-body">
+    <a class="card-title" href="/item/{{ item._id }}">{{ item.title }}</a>
+    <div class="card-meta">
+      <span class="cat-tag" style="background:{{ accent }};">{{ item.category_slug|replace('-',' ')|title }}</span>
+      <span class="text-muted text-small">{{ item.source_type }}</span>
+    </div>
+    <div class="card-stats">
+      <span><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>{{ item.views or 0 }}</span>
+      <span><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>{{ item.downloads or 0 }}</span>
+    </div>
+  </div>
+  <div class="card-actions">
+    <a href="/item/{{ item._id }}" class="primary">View</a>
+    <a href="/download/{{ item._id }}">Download</a>
+  </div>
+</div>
+{% endif %}
+
+{% endmacro %}
+
+
+{# ─── pagination macro ────────────────────────────────────────────────────── #}
+{% macro pagination(page, total_pages, base_url) %}
+{% if total_pages > 1 %}
+{% set sep = '&' if '?' in base_url else '?' %}
+<div class="pagination">
+  {% if page > 1 %}
+  <a class="arr" href="{{ base_url }}{{ sep }}page={{ page-1 }}">‹</a>
+  {% endif %}
+
+  {% set start = [1, page-3]|max %}
+  {% set end   = [total_pages, page+3]|min %}
+
+  {% if start > 1 %}
+  <a href="{{ base_url }}{{ sep }}page=1">1</a>
+  {% if start > 2 %}<span class="gap">…</span>{% endif %}
+  {% endif %}
+
+  {% for p in range(start, end+1) %}
+    {% if p == page %}
+    <span class="current">{{ p }}</span>
+    {% else %}
+    <a href="{{ base_url }}{{ sep }}page={{ p }}">{{ p }}</a>
+    {% endif %}
+  {% endfor %}
+
+  {% if end < total_pages %}
+  {% if end < total_pages - 1 %}<span class="gap">…</span>{% endif %}
+  <a href="{{ base_url }}{{ sep }}page={{ total_pages }}">{{ total_pages }}</a>
+  {% endif %}
+
+  {% if page < total_pages %}
+  <a class="arr" href="{{ base_url }}{{ sep }}page={{ page+1 }}">›</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endmacro %}

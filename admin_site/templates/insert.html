@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Insert Content{% endblock %}
+{% block topbar_title %}Insert / Upload Content{% endblock %}
+{% block topbar_icon %}<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>{% endblock %}
+
+{% block content %}
+{% if success_id %}
+<div class="alert alert-ok" style="max-width:860px;">
+  ✅ Item inserted successfully!
+  <a href="{{ url_for('edit_item', item_id=success_id) }}" style="margin-left:12px;">Edit it →</a>
+  <a href="{{ url_for('insert') }}" style="margin-left:12px;">Insert Another →</a>
+  <a href="http://localhost:5001" target="_blank" style="margin-left:12px;">View on Public Site ↗</a>
+</div>
+{% endif %}
+{% if error %}
+<div class="alert alert-err" style="max-width:860px;">⚠️ {{ error }}</div>
+{% endif %}
+
+<div class="admin-form-card">
+  <div class="admin-form-header">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Add New Content (instant publish to public site)
+  </div>
+  <div class="admin-form-body">
+    <form method="POST" enctype="multipart/form-data">
+
+      <!-- Content type tabs -->
+      <div class="type-tabs">
+        <div class="type-tab active" data-tab="link">🔗 Link</div>
+        <div class="type-tab" data-tab="video">🎬 Video</div>
+        <div class="type-tab" data-tab="image">🖼️ Image</div>
+        <div class="type-tab" data-tab="file">📄 File</div>
+      </div>
+      <input type="hidden" name="type" id="typeInput" value="link">
+
+      <!-- Core fields -->
+      <div class="form-group">
+        <label>Title *</label>
+        <input class="form-control" name="title" placeholder="Clear descriptive title" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control" name="description" placeholder="Full description — what it is, who it's for, what it contains…" rows="4"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control" name="category_slug">
+            {% for cat in categories %}
+            <option value="{{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Zone / Server</label>
+          <select class="form-control" name="zone_slug">
+            {% for z in zones %}
+            <option value="{{ z.slug }}" {% if z.slug=='global' %}selected{% endif %}>{{ z.flag_emoji }} {{ z.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input class="form-control" name="tags" placeholder="free, tool, assam, 2024, open-source">
+        </div>
+        <div class="form-group">
+          <label>Uploader / Author Name</label>
+          <input class="form-control" name="uploader_name" value="admin" placeholder="admin">
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;gap:20px;flex-wrap:wrap;">
+        <label class="form-check">
+          <input type="checkbox" name="is_featured">
+          <span>⭐ Mark as Featured</span>
+        </label>
+      </div>
+
+      <!-- ── Link pane ── -->
+      <div class="type-pane active" id="pane-link">
+        <div class="form-group">
+          <label>URL *</label>
+          <input class="form-control" name="url" type="url" placeholder="https://example.com">
+        </div>
+        <div class="form-group">
+          <label>Thumbnail / Preview Image URL</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="https://example.com/preview.jpg">
+        </div>
+      </div>
+
+      <!-- ── Video pane ── -->
+      <div class="type-pane" id="pane-video">
+        <div class="form-group">
+          <label>Upload Video File</label>
+          <div class="drop-zone" id="dzVideo">
+            <div class="dz-icon">🎬</div>
+            <div class="dz-text">Drag & drop video here or click to browse</div>
+            <div class="dz-hint">MP4, MOV, AVI, MKV, WebM — up to 512 MB</div>
+            <div class="dz-preview" id="dzPreview"></div>
+            <input type="file" id="fileInput" name="file" accept="video/*" style="display:none;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>— or Paste External URL (YouTube, Vimeo, direct .mp4)</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://youtube.com/watch?v=… or https://…/video.mp4">
+        </div>
+        <div class="form-group">
+          <label>Custom Thumbnail URL (optional)</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="Auto-generated for Cloudinary uploads">
+        </div>
+      </div>
+
+      <!-- ── Image pane ── -->
+      <div class="type-pane" id="pane-image">
+        <div class="form-group">
+          <label>Upload Image File</label>
+          <div class="drop-zone" id="dzImage">
+            <div class="dz-icon">🖼️</div>
+            <div class="dz-text">Drag & drop image here or click to browse</div>
+            <div class="dz-hint">JPG, PNG, GIF, WebP, SVG — up to 50 MB</div>
+            <div class="dz-preview" id="dzPreview"></div>
+            <input type="file" id="fileInput" name="file" accept="image/*" style="display:none;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>— or External Image URL</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://…/image.jpg">
+        </div>
+      </div>
+
+      <!-- ── File pane ── -->
+      <div class="type-pane" id="pane-file">
+        <div class="form-group">
+          <label>Upload File</label>
+          <div class="drop-zone" id="dzFile">
+            <div class="dz-icon">📄</div>
+            <div class="dz-text">Drag & drop any file or click to browse</div>
+            <div class="dz-hint">PDF, ZIP, DOCX, EXE, APK, ISO… — up to 512 MB</div>
+            <div class="dz-preview" id="dzPreview"></div>
+            <input type="file" id="fileInput" name="file" style="display:none;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>— or External File URL</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://…/file.zip">
+        </div>
+        <div class="form-group">
+          <label>Thumbnail URL (optional)</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="https://…">
+        </div>
+      </div>
+
+      <!-- Extra details -->
+      <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+        <div class="section-hd mb-16" style="border-left:2px solid var(--border);padding-left:10px;">
+          <h2 style="font-size:13px;color:var(--text-muted);">Extra Details (optional)</h2>
+        </div>
+        <div class="extra-details-grid">
+          <div class="form-group">
+            <label>Author / Creator</label>
+            <input class="form-control" name="extra_author" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Source / Publisher</label>
+            <input class="form-control" name="extra_source" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input class="form-control" name="extra_language" placeholder="English, Hindi, Assamese…">
+          </div>
+          <div class="form-group">
+            <label>Format / Quality</label>
+            <input class="form-control" name="extra_format" placeholder="1080p, PDF, MP3…">
+          </div>
+          <div class="form-group">
+            <label>Size</label>
+            <input class="form-control" name="extra_size" placeholder="24 MB, 2 hours…">
+          </div>
+          <div class="form-group">
+            <label>Duration</label>
+            <input class="form-control" name="extra_duration" placeholder="10:34, 45 mins…">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+        <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;padding:13px;">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Publish Now
+        </button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

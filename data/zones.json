@@ -1,0 +1,134 @@
+[
+  {
+    "name": "Global",
+    "slug": "global",
+    "country": "World",
+    "parent_slug": null,
+    "flag_emoji": "🌍",
+    "description": "International content",
+    "sort_order": 1,
+    "created_at": "2026-05-20 03:47:27.995001",
+    "_id": "63b52208f3eb4ac08ea8a8a0"
+  },
+  {
+    "name": "India",
+    "slug": "india",
+    "country": "India",
+    "parent_slug": null,
+    "flag_emoji": "🇮🇳",
+    "description": "All India content",
+    "sort_order": 2,
+    "created_at": "2026-05-20 03:47:27.995676",
+    "_id": "827e5c2b6a9747848964b547"
+  },
+  {
+    "name": "Mumbai",
+    "slug": "india-mumbai",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🏙️",
+    "description": "Mumbai, Maharashtra",
+    "sort_order": 4,
+    "created_at": "2026-05-20 03:47:27.997934",
+    "_id": "ff9019e8928747938cbbb50d"
+  },
+  {
+    "name": "Delhi",
+    "slug": "india-delhi",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🏛️",
+    "description": "New Delhi",
+    "sort_order": 5,
+    "created_at": "2026-05-20 03:47:28.000387",
+    "_id": "12179e3d808a43feaf2ed83f"
+  },
+  {
+    "name": "Uttar Pradesh",
+    "slug": "india-up",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🌾",
+    "description": "Uttar Pradesh",
+    "sort_order": 6,
+    "created_at": "2026-05-20 03:47:28.002762",
+    "_id": "b061f008df5143c08d7923c7"
+  },
+  {
+    "name": "Bihar",
+    "slug": "india-bihar",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🌿",
+    "description": "Bihar",
+    "sort_order": 7,
+    "created_at": "2026-05-20 03:47:28.004060",
+    "_id": "3793637a93d3448fa4710b92"
+  },
+  {
+    "name": "Kolkata",
+    "slug": "india-kolkata",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🌸",
+    "description": "Kolkata, West Bengal",
+    "sort_order": 8,
+    "created_at": "2026-05-20 03:47:28.005100",
+    "_id": "685961f450a44a369b145eab"
+  },
+  {
+    "name": "Chennai",
+    "slug": "india-chennai",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "🏖️",
+    "description": "Chennai, Tamil Nadu",
+    "sort_order": 9,
+    "created_at": "2026-05-20 03:47:28.006072",
+    "_id": "97a74d5137a04f4e9e7149bc"
+  },
+  {
+    "name": "Bangalore",
+    "slug": "india-bangalore",
+    "country": "India",
+    "parent_slug": "india",
+    "flag_emoji": "💻",
+    "description": "Bangalore, Karnataka",
+    "sort_order": 10,
+    "created_at": "2026-05-20 03:47:28.007084",
+    "_id": "25b3adb3e0854be59769f9e0"
+  },
+  {
+    "name": "United States",
+    "slug": "usa",
+    "country": "USA",
+    "parent_slug": null,
+    "flag_emoji": "🇺🇸",
+    "description": "USA content",
+    "sort_order": 11,
+    "created_at": "2026-05-20 03:47:28.008250",
+    "_id": "bab8b56af588458dbb37000a"
+  },
+  {
+    "name": "United Kingdom",
+    "slug": "uk",
+    "country": "UK",
+    "parent_slug": null,
+    "flag_emoji": "🇬🇧",
+    "description": "UK content",
+    "sort_order": 12,
+    "created_at": "2026-05-20 03:47:28.009411",
+    "_id": "e0eee0373bc4468daee876f3"
+  },
+  {
+    "name": "Europe",
+    "slug": "europe",
+    "country": "Europe",
+    "parent_slug": null,
+    "flag_emoji": "🇪🇺",
+    "description": "European content",
+    "sort_order": 13,
+    "created_at": "2026-05-20 03:47:28.010528",
+    "_id": "b880a3a168a04d7fbf10194b"
+  }
+]

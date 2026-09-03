@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}404{% endblock %}
+{% block content %}
+<div class="empty-state" style="padding:80px;">
+  <div class="icon" style="font-size:56px;">🕳️</div>
+  <h3 style="font-size:22px;">404 — Not Found</h3>
+  <p>That page doesn't exist.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}" style="margin-top:16px;">← Dashboard</a>
+</div>
+{% endblock %}

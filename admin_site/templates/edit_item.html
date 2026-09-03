@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Edit: {{ item.title[:40] }}{% endblock %}
+{% block topbar_title %}Edit Item{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert alert-err" style="max-width:860px;">⚠️ {{ error }}</div>
+{% endif %}
+
+<div class="admin-form-card">
+  <div class="admin-form-header">
+    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Editing: {{ item.title[:60] }}
+    <span class="badge badge-{{ item.type }}" style="margin-left:auto;">{{ item.type }}</span>
+  </div>
+  <div class="admin-form-body">
+    <form method="POST" enctype="multipart/form-data">
+
+      <!-- Core fields -->
+      <div class="form-group">
+        <label>Title *</label>
+        <input class="form-control" name="title" value="{{ item.title }}" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control" name="description" rows="4">{{ item.description or '' }}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control" name="category_slug">
+            {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if cat.slug == item.category_slug %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Zone / Server</label>
+          <select class="form-control" name="zone_slug">
+            {% for z in zones %}
+            <option value="{{ z.slug }}" {% if z.slug == item.zone_slug %}selected{% endif %}>{{ z.flag_emoji }} {{ z.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input class="form-control" name="tags" value="{{ item.tags|join(', ') if item.tags else '' }}">
+        </div>
+        <div class="form-group">
+          <label>Uploader Name</label>
+          <input class="form-control" name="uploader_name" value="{{ item.uploader_name or 'admin' }}">
+        </div>
+      </div>
+
+      <!-- URL / Media -->
+      <div class="form-group">
+        <label>URL / Source Link</label>
+        <input class="form-control" name="url" type="url" value="{{ item.url or '' }}" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label>Thumbnail URL</label>
+        <input class="form-control" name="thumbnail_url" value="{{ item.thumbnail_url or '' }}" placeholder="https://…">
+        {% if item.thumbnail_url %}
+        <div style="margin-top:8px;">
+          <img src="{{ item.thumbnail_url }}" style="max-height:80px;border:1px solid var(--border);" alt="">
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Replace media -->
+      {% if item.type in ['video','image','file'] %}
+      <div class="form-group">
+        <label>Replace File (upload new)</label>
+        <div class="drop-zone" style="padding:20px;">
+          <div class="dz-icon" style="font-size:24px;">📂</div>
+          <div class="dz-text" style="font-size:12px;">Click or drag a new file to replace current</div>
+          {% if item.cloudinary_id %}
+          <div class="dz-hint">Current: Cloudinary / {{ item.cloudinary_id[:30] }}</div>
+          {% endif %}
+          <div class="dz-preview" id="dzPreview"></div>
+          <input type="file" id="fileInput" name="file" style="display:none;">
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Status toggles -->
+      <div class="form-group" style="display:flex;gap:24px;flex-wrap:wrap;padding:16px;background:var(--bg-raised);border:1px solid var(--border);">
+        <label class="form-check">
+          <input type="checkbox" name="is_approved" {% if item.is_approved %}checked{% endif %}>
+          <span>✅ Approved (visible on public site)</span>
+        </label>
+        <label class="form-check">
+          <input type="checkbox" name="is_featured" {% if item.is_featured %}checked{% endif %}>
+          <span>⭐ Featured (show on homepage)</span>
+        </label>
+      </div>
+
+      <!-- Extra details -->
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+        <div class="section-hd mb-16" style="border-left:2px solid var(--border);padding-left:10px;">
+          <h2 style="font-size:13px;color:var(--text-muted);">Extra Details</h2>
+        </div>
+        {% set extra = item.extra_details or {} %}
+        <div class="extra-details-grid">
+          <div class="form-group">
+            <label>Author / Creator</label>
+            <input class="form-control" name="extra_author" value="{{ extra.get('author','') }}">
+          </div>
+          <div class="form-group">
+            <label>Source / Publisher</label>
+            <input class="form-control" name="extra_source" value="{{ extra.get('source','') }}">
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <input class="form-control" name="extra_language" value="{{ extra.get('language','') }}">
+          </div>
+          <div class="form-group">
+            <label>Format / Quality</label>
+            <input class="form-control" name="extra_format" value="{{ extra.get('format','') }}">
+          </div>
+          <div class="form-group">
+            <label>Size</label>
+            <input class="form-control" name="extra_size" value="{{ extra.get('size','') }}">
+          </div>
+          <div class="form-group">
+            <label>Duration</label>
+            <input class="form-control" name="extra_duration" value="{{ extra.get('duration','') }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Info panel -->
+      <div style="background:var(--bg-raised);border:1px solid var(--border);padding:16px;margin-top:16px;font-size:12px;color:var(--text-muted);">
+        <strong style="color:var(--text-sec);">Item Info</strong>
+        &nbsp;·&nbsp; ID: <code style="background:var(--bg-input);padding:1px 5px;">{{ item._id }}</code>
+        &nbsp;·&nbsp; Created: {{ item.created_at[:10] if item.created_at else '—' }}
+        &nbsp;·&nbsp; Views: {{ item.views or 0 }}
+        &nbsp;·&nbsp; Downloads: {{ item.downloads or 0 }}
+        &nbsp;·&nbsp; Source: {{ item.source_type }}
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap;">
+        <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center;padding:12px;">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Changes
+        </button>
+        <a href="{{ url_for('items') }}" class="btn btn-outline">← Back</a>
+        {% if item.url %}
+        <a class="btn btn-outline" href="{{ item.url }}" target="_blank">View ↗</a>
+        {% endif %}
+        <form method="POST" action="{{ url_for('delete_item', item_id=item._id) }}"
+              data-confirm="Permanently delete '{{ item.title[:40] }}'?">
+          <button type="submit" class="btn btn-danger">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Delete
+          </button>
+        </form>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

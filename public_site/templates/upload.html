@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Upload{% endblock %}
+{% block topbar_title %}➕ Upload / Add Content{% endblock %}
+
+{% block content %}
+{% if success %}
+<div class="upload-success">
+  <div class="icon">✅</div>
+  <h2>Submitted Successfully!</h2>
+  <p>Your content has been submitted for admin review. It will appear publicly once approved.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a class="btn btn-primary" href="{{ url_for('upload') }}">Upload More</a>
+    <a class="btn btn-outline" href="{{ url_for('index') }}">Go Home</a>
+  </div>
+</div>
+{% else %}
+
+{% if error %}
+<div class="alert alert-err">⚠️ {{ error }}</div>
+{% endif %}
+
+<div class="form-box">
+  <div class="form-box-header">
+    <svg viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Upload Content to NexusVault
+  </div>
+  <div class="form-body">
+    <div class="alert alert-info">
+      📋 Public uploads go through admin approval before appearing on the site.
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+      <!-- Type Tabs -->
+      <div class="type-tabs">
+        <div class="type-tab active" data-tab="link">🔗 Link</div>
+        <div class="type-tab" data-tab="video">🎬 Video</div>
+        <div class="type-tab" data-tab="image">🖼️ Image</div>
+        <div class="type-tab" data-tab="file">📄 File</div>
+      </div>
+      <input type="hidden" name="type" id="typeInput" value="link">
+
+      <!-- Common fields -->
+      <div class="form-group">
+        <label>Title *</label>
+        <input class="form-control" name="title" placeholder="Give it a clear, descriptive title" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-control" name="description" placeholder="Describe what this is, what it contains, why it's useful…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-control" name="category_slug">
+            {% for cat in categories %}
+            <option value="{{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Zone / Region</label>
+          <select class="form-control" name="zone_slug">
+            {% for z in zones %}
+            <option value="{{ z.slug }}" {% if z.slug=='global' %}selected{% endif %}>{{ z.flag_emoji }} {{ z.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input class="form-control" name="tags" placeholder="e.g. free, tool, india, 2024">
+        </div>
+        <div class="form-group">
+          <label>Your Name / Handle</label>
+          <input class="form-control" name="uploader_name" placeholder="Anonymous" maxlength="60">
+        </div>
+      </div>
+
+      <!-- Link pane -->
+      <div class="type-pane active" id="pane-link">
+        <div class="form-group">
+          <label>URL *</label>
+          <input class="form-control" name="url" type="url" placeholder="https://example.com">
+        </div>
+        <div class="form-group">
+          <label>Thumbnail URL (optional)</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="https://example.com/thumb.jpg">
+        </div>
+      </div>
+
+      <!-- Video pane -->
+      <div class="type-pane" id="pane-video">
+        <div class="form-group">
+          <label>Video File (upload)</label>
+          <div style="background:var(--bg-input);border:2px dashed var(--border);padding:28px;text-align:center;cursor:pointer;" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:32px;margin-bottom:8px;">🎬</div>
+            <div style="font-size:13px;color:var(--text-muted);">Click to select video file<br><span style="font-size:11px;">MP4, MOV, AVI, MKV — up to 512 MB</span></div>
+            <div id="filePreview" style="display:none;margin-top:10px;font-size:12px;color:var(--accent);"></div>
+          </div>
+          <input type="file" id="fileInput" name="file" accept="video/*" style="display:none;">
+        </div>
+        <div class="form-group">
+          <label>— or External Video URL</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://youtube.com/watch?v=... or direct .mp4 link">
+        </div>
+        <div class="form-group">
+          <label>Thumbnail URL (optional)</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="https://…">
+        </div>
+      </div>
+
+      <!-- Image pane -->
+      <div class="type-pane" id="pane-image">
+        <div class="form-group">
+          <label>Image File (upload)</label>
+          <div style="background:var(--bg-input);border:2px dashed var(--border);padding:28px;text-align:center;cursor:pointer;" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:32px;margin-bottom:8px;">🖼️</div>
+            <div style="font-size:13px;color:var(--text-muted);">Click to select image<br><span style="font-size:11px;">JPG, PNG, GIF, WebP — up to 50 MB</span></div>
+            <div id="filePreview" style="display:none;margin-top:10px;font-size:12px;color:var(--accent);"></div>
+          </div>
+          <input type="file" id="fileInput" name="file" accept="image/*" style="display:none;">
+        </div>
+        <div class="form-group">
+          <label>— or External Image URL</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://…">
+        </div>
+      </div>
+
+      <!-- File pane -->
+      <div class="type-pane" id="pane-file">
+        <div class="form-group">
+          <label>File (upload)</label>
+          <div style="background:var(--bg-input);border:2px dashed var(--border);padding:28px;text-align:center;cursor:pointer;" onclick="document.getElementById('fileInput').click()">
+            <div style="font-size:32px;margin-bottom:8px;">📄</div>
+            <div style="font-size:13px;color:var(--text-muted);">Click to select any file<br><span style="font-size:11px;">PDF, ZIP, DOCX, EXE… — up to 512 MB</span></div>
+            <div id="filePreview" style="display:none;margin-top:10px;font-size:12px;color:var(--accent);"></div>
+          </div>
+          <input type="file" id="fileInput" name="file" style="display:none;">
+        </div>
+        <div class="form-group">
+          <label>— or External File URL</label>
+          <input class="form-control" name="external_url" type="url" placeholder="https://…">
+        </div>
+        <div class="form-group">
+          <label>Thumbnail URL (optional)</label>
+          <input class="form-control" name="thumbnail_url" type="url" placeholder="https://…">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Submit for Review
+      </button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Live stat grid -->
+<div class="stat-grid">
+  <div class="stat-card accent">
+    <div class="icon">📦</div>
+    <div class="num" data-stat="total">{{ stats.total }}</div>
+    <div class="lbl">Total Items</div>
+  </div>
+  <div class="stat-card success-c">
+    <div class="icon">✅</div>
+    <div class="num" data-stat="approved">{{ stats.approved }}</div>
+    <div class="lbl">Approved</div>
+  </div>
+  <div class="stat-card warning-c">
+    <div class="icon">⏳</div>
+    <div class="num" data-stat="pending">{{ stats.pending }}</div>
+    <div class="lbl">Pending</div>
+  </div>
+  <div class="stat-card info-c">
+    <div class="icon">🔗</div>
+    <div class="num" data-stat="links">{{ stats.links }}</div>
+    <div class="lbl">Links</div>
+  </div>
+  <div class="stat-card danger-c">
+    <div class="icon">🎬</div>
+    <div class="num" data-stat="videos">{{ stats.videos }}</div>
+    <div class="lbl">Videos</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">🖼️</div>
+    <div class="num" data-stat="images">{{ stats.images }}</div>
+    <div class="lbl">Images</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">📄</div>
+    <div class="num" data-stat="files">{{ stats.files }}</div>
+    <div class="lbl">Files</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">💬</div>
+    <div class="num" data-stat="discussions">{{ stats.discussions }}</div>
+    <div class="lbl">Discussions</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">📁</div>
+    <div class="num" data-stat="categories">{{ stats.categories }}</div>
+    <div class="lbl">Categories</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">🌐</div>
+    <div class="num" data-stat="zones">{{ stats.zones }}</div>
+    <div class="lbl">Zones</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+  <!-- Pending approval -->
+  <div>
+    <div class="section-hd">
+      <h2>⏳ Pending Approval</h2>
+      <a href="{{ url_for('items', approved='0') }}" style="font-size:12px;color:var(--text-muted);">View all →</a>
+    </div>
+    {% if pending %}
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Title</th><th>Type</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for item in pending %}
+      <tr>
+        <td class="title-cell">
+          <a href="{{ url_for('edit_item', item_id=item._id) }}">{{ item.title[:50] }}</a>
+          <div class="sub">by {{ item.uploader_name or 'Anon' }}</div>
+        </td>
+        <td><span class="badge badge-{{ item.type }}">{{ item.type }}</span></td>
+        <td>
+          <div class="actions-cell">
+            <button class="action-btn action-btn-approve" data-action="approve" data-id="{{ item._id }}">Approve</button>
+            <a class="action-btn action-btn-edit" href="{{ url_for('edit_item', item_id=item._id) }}">Edit</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding:30px;">
+      <div class="icon">✨</div>
+      <h3>No pending items</h3>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent uploads -->
+  <div>
+    <div class="section-hd">
+      <h2>🕐 Recent Uploads</h2>
+      <a href="{{ url_for('items') }}" style="font-size:12px;color:var(--text-muted);">View all →</a>
+    </div>
+    {% if recent %}
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Title</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for item in recent %}
+      <tr>
+        <td class="title-cell">
+          <a href="{{ url_for('edit_item', item_id=item._id) }}">{{ item.title[:45] }}</a>
+          <div class="sub">{{ item.created_at[:10] if item.created_at else '' }}</div>
+        </td>
+        <td><span class="badge badge-{{ item.type }}">{{ item.type }}</span></td>
+        <td>
+          <span id="approved-badge-{{ item._id }}" class="badge {{ 'badge-yes' if item.is_approved else 'badge-no' }}">{{ 'YES' if item.is_approved else 'NO' }}</span>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Quick actions -->
+<div style="margin-top:28px;" class="section-hd"><h2>⚡ Quick Actions</h2></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+  <a class="btn btn-primary" href="{{ url_for('insert') }}">+ Insert Item</a>
+  <a class="btn btn-outline" href="{{ url_for('items', approved='0') }}">Review Pending</a>
+  <a class="btn btn-outline" href="{{ url_for('categories') }}">Manage Categories</a>
+  <a class="btn btn-outline" href="{{ url_for('zones') }}">Manage Zones</a>
+  <a class="btn btn-outline" href="{{ url_for('discussions') }}">View Discussions</a>
+  <a class="btn btn-outline" href="http://localhost:5001" target="_blank">Open Public Site ↗</a>
+</div>
+{% endblock %}

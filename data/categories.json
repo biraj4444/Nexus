@@ -1,0 +1,152 @@
+[
+  {
+    "name": "Official",
+    "slug": "official",
+    "icon": "🏛️",
+    "color": "#1a73e8",
+    "sort_order": 1,
+    "description": "Curated official content",
+    "created_at": "2026-05-20 03:47:27.984855",
+    "_id": "a830a3a7e6db4c12a4aa486b"
+  },
+  {
+    "name": "Public",
+    "slug": "public",
+    "icon": "🌐",
+    "color": "#34a853",
+    "sort_order": 2,
+    "description": "Community-uploaded content",
+    "created_at": "2026-05-20 03:47:27.985894",
+    "_id": "b01397db56e14e3a8839281f"
+  },
+  {
+    "name": "High Demand",
+    "slug": "high-demand",
+    "icon": "🔥",
+    "color": "#ff6b00",
+    "sort_order": 3,
+    "description": "Most requested resources",
+    "created_at": "2026-05-20 03:47:27.986877",
+    "_id": "1dc13ebe35664483b70cd6ce"
+  },
+  {
+    "name": "Events",
+    "slug": "events",
+    "icon": "📅",
+    "color": "#9c27b0",
+    "sort_order": 4,
+    "description": "Events & announcements",
+    "created_at": "2026-05-20 03:47:27.987759",
+    "_id": "8df0ca04271443b685750e7f"
+  },
+  {
+    "name": "Technology",
+    "slug": "technology",
+    "icon": "💻",
+    "color": "#00bcd4",
+    "sort_order": 5,
+    "description": "Tech resources & tools",
+    "created_at": "2026-05-20 03:47:27.988676",
+    "_id": "cbaf1ed8e7c347db89117b0f"
+  },
+  {
+    "name": "Education",
+    "slug": "education",
+    "icon": "📚",
+    "color": "#4caf50",
+    "sort_order": 6,
+    "description": "Learning & tutorials",
+    "created_at": "2026-05-20 03:47:27.989503",
+    "_id": "ea181d484e394e07aee7f395"
+  },
+  {
+    "name": "Entertainment",
+    "slug": "entertainment",
+    "icon": "🎭",
+    "color": "#e91e63",
+    "sort_order": 7,
+    "description": "Fun & entertainment",
+    "created_at": "2026-05-20 03:47:27.990320",
+    "_id": "2ef9d7773bb44c57ae1480f2"
+  },
+  {
+    "name": "News",
+    "slug": "news",
+    "icon": "📰",
+    "color": "#607d8b",
+    "sort_order": 8,
+    "description": "News sources",
+    "created_at": "2026-05-20 03:47:27.991163",
+    "_id": "70d38af416b44c3daccab695"
+  },
+  {
+    "name": "Tools",
+    "slug": "tools",
+    "icon": "🛠️",
+    "color": "#ff5722",
+    "sort_order": 9,
+    "description": "Useful online tools",
+    "created_at": "2026-05-20 03:47:27.992100",
+    "_id": "800f26ab8753432298917762"
+  },
+  {
+    "name": "Downloads",
+    "slug": "downloads",
+    "icon": "⬇️",
+    "color": "#795548",
+    "sort_order": 10,
+    "description": "Files & downloads",
+    "created_at": "2026-05-20 03:47:27.993395",
+    "_id": "feb88b49966d4b2a8c7ba1ed"
+  },
+  {
+    "name": "Webstore",
+    "slug": "webstore",
+    "icon": "🛍️",
+    "color": "#555555",
+    "description": "All usefull website link collection",
+    "sort_order": 11,
+    "created_at": "2026-08-31 09:48:04.916005",
+    "_id": "7d8ef09af4344a069a3d3ab6"
+  },
+  {
+    "name": "18<content",
+    "slug": "18-content",
+    "icon": "📁",
+    "color": "#30615e",
+    "description": "Entering Hot Zone .....",
+    "sort_order": 12,
+    "created_at": "2026-08-31 09:50:04.374357",
+    "_id": "a98b61a5b9c243d7b24b795c"
+  },
+  {
+    "name": "Web dev",
+    "slug": "web-development",
+    "icon": "💻",
+    "color": "#d16e28",
+    "description": "All usefull website  for dev environment",
+    "sort_order": 13,
+    "created_at": "2026-09-03 18:51:32.786339",
+    "_id": "4bd7924e838f44af9b45041c"
+  },
+  {
+    "name": "Editor  Zone 🪄📷",
+    "slug": "editor-zone",
+    "icon": "🪄📷",
+    "color": "#b93fd1",
+    "description": "Best free editor zone",
+    "sort_order": 14,
+    "created_at": "2026-09-03 18:53:39.296588",
+    "_id": "3e49579263a64c5d8eb070ca"
+  },
+  {
+    "name": "All Movie's",
+    "slug": "all-movie-s",
+    "icon": "🗻",
+    "color": "#000f45",
+    "description": "Welcome to the movies zone",
+    "sort_order": 15,
+    "created_at": "2026-09-03 18:56:01.089739",
+    "_id": "d3b0be79831c4f869412cfed"
+  }
+]

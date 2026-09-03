@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "macros.html" import item_card, pagination %}
+{% block title %}{{ category.name }}{% endblock %}
+{% block topbar_title %}{{ category.icon }} {{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="section-hd">
+  <h2>{{ category.icon }} {{ category.name }}</h2>
+  <span class="text-muted text-small">{{ total }} items — Page {{ page }} of {{ total_pages }}</span>
+</div>
+{% if category.description %}
+<p class="text-muted mb-16" style="font-size:13px;">{{ category.description }}</p>
+{% endif %}
+
+<div class="filter-bar mb-16">
+  <a class="filter-chip {% if not itype %}active{% endif %}" href="{{ url_for('category', slug=category.slug) }}">All</a>
+  <a class="filter-chip {% if itype=='link'  %}active{% endif %}" href="{{ url_for('category', slug=category.slug, type='link')  }}">🔗 Links</a>
+  <a class="filter-chip {% if itype=='video' %}active{% endif %}" href="{{ url_for('category', slug=category.slug, type='video') }}">🎬 Videos</a>
+  <a class="filter-chip {% if itype=='image' %}active{% endif %}" href="{{ url_for('category', slug=category.slug, type='image') }}">🖼️ Images</a>
+  <a class="filter-chip {% if itype=='file'  %}active{% endif %}" href="{{ url_for('category', slug=category.slug, type='file')  }}">📄 Files</a>
+</div>
+
+{% if items %}
+{% set media_items = items | selectattr('type', 'in', ['video', 'image']) | list %}
+{% set row_items   = items | selectattr('type', 'in', ['link', 'file'])   | list %}
+
+{% if media_items %}
+<div class="grid mb-24">{% for item in media_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+
+{% if row_items %}
+{% if media_items %}
+<div class="section-hd mb-16" style="border-left-color:var(--border);">
+  <h2 style="font-size:13px;color:var(--text-muted);">🔗 Links &amp; Files</h2>
+</div>
+{% endif %}
+<div class="link-file-list">{% for item in row_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+
+{{ pagination(page, total_pages, url_for('category', slug=category.slug) + ('?type=' + itype if itype else '')) }}
+{% else %}
+<div class="empty-state">
+  <div class="icon">{{ category.icon }}</div>
+  <h3>No items in {{ category.name }} yet</h3>
+  <p><a href="{{ url_for('upload') }}">Upload something</a> or check back later.</p>
+</div>
+{% endif %}
+{% endblock %}

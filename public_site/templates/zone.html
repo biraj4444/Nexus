@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import item_card, pagination %}
+{% block title %}{{ zone.name }} Server{% endblock %}
+{% block topbar_title %}{{ zone.flag_emoji }} {{ zone.name }}{% endblock %}
+
+{% block content %}
+<div class="section-hd">
+  <h2>{{ zone.flag_emoji }} {{ zone.name }}</h2>
+  <span class="text-muted text-small">{{ total }} items — Page {{ page }} of {{ total_pages }}</span>
+</div>
+<p class="text-muted mb-16" style="font-size:13px;">{{ zone.description or '' }}</p>
+
+{% if items %}
+{% set media_items = items | selectattr('type', 'in', ['video', 'image']) | list %}
+{% set row_items   = items | selectattr('type', 'in', ['link', 'file'])   | list %}
+{% if media_items %}
+<div class="grid mb-24">{% for item in media_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{% if row_items %}
+<div class="link-file-list">{% for item in row_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{{ pagination(page, total_pages, url_for('zone', slug=zone.slug)) }}
+{% else %}
+<div class="empty-state">
+  <div class="icon">{{ zone.flag_emoji }}</div>
+  <h3>No content in {{ zone.name }} yet</h3>
+  <p><a href="{{ url_for('upload') }}">Be the first to contribute</a></p>
+</div>
+{% endif %}
+{% endblock %}

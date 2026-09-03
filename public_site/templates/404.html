@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}404 Not Found{% endblock %}
+{% block content %}
+<div class="empty-state" style="padding:80px 24px;">
+  <div class="icon" style="font-size:64px;">🕳️</div>
+  <h3 style="font-size:24px;">404 — Not Found</h3>
+  <p style="margin:12px 0 24px;">The page or item you're looking for doesn't exist.</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Go Home</a>
+</div>
+{% endblock %}

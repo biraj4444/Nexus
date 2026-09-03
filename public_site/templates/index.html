@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from "macros.html" import item_card, pagination %}
+{% block title %}Home{% endblock %}
+{% block topbar_title %}Home — Everything in One Place{% endblock %}
+
+{% block content %}
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-pill"><div>
+    <div class="num" data-stat="total">{{ stats.total }}</div>
+    <div class="lbl">Total Items</div>
+  </div></div>
+  <div class="stat-pill"><div>
+    <div class="num" data-stat="links">{{ stats.links }}</div>
+    <div class="lbl">Links</div>
+  </div></div>
+  <div class="stat-pill"><div>
+    <div class="num" data-stat="videos">{{ stats.videos }}</div>
+    <div class="lbl">Videos</div>
+  </div></div>
+  <div class="stat-pill"><div>
+    <div class="num" data-stat="images">{{ stats.images }}</div>
+    <div class="lbl">Images</div>
+  </div></div>
+  <div class="stat-pill"><div>
+    <div class="num" data-stat="files">{{ stats.files }}</div>
+    <div class="lbl">Files</div>
+  </div></div>
+</div>
+
+<!-- Featured -->
+{% if featured %}
+<div class="section-hd">
+  <h2>⭐ Featured</h2>
+  <a href="{{ url_for('new') }}">View all →</a>
+</div>
+<div class="featured-grid mb-24">
+  {% for item in featured %}
+  {% set type_icons = {'link': '🔗', 'video': '🎬', 'image': '🖼️', 'file': '📄'} %}
+  <a href="{{ url_for('item_detail', item_id=item._id) }}" class="featured-card">
+    <div class="card-thumb" style="aspect-ratio:16/9;">
+      {% if item.thumbnail_url %}
+      <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}" loading="lazy">
+      {% else %}
+      <div class="card-thumb-placeholder">{{ type_icons.get(item.type,'📦') }}</div>
+      {% endif %}
+      <span class="card-type-badge type-{{ item.type }}">{{ item.type }}</span>
+      <span class="featured-badge">★ Featured</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title" style="font-size:14.5px;">{{ item.title }}</div>
+      <div class="card-stats mt-8">
+        <span>👁 {{ item.views or 0 }}</span>
+        <span>⬇ {{ item.downloads or 0 }}</span>
+        <span class="cat-tag" style="background:#333;color:#ccc;font-size:10px;padding:2px 7px;font-weight:600;text-transform:uppercase;">{{ item.category_slug|replace('-',' ')|title }}</span>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- All Items -->
+<div class="section-hd">
+  <h2>All Items</h2>
+  <span class="text-muted text-small">{{ total }} total — Page {{ page }} of {{ total_pages }}</span>
+</div>
+
+<!-- Type filter -->
+<div class="filter-bar mb-16">
+  <a class="filter-chip {% if not request.args.get('type') %}active{% endif %}" href="{{ url_for('index') }}">All</a>
+  <a class="filter-chip {% if request.args.get('type')=='link'  %}active{% endif %}" href="{{ url_for('index', type='link')  }}">🔗 Links</a>
+  <a class="filter-chip {% if request.args.get('type')=='video' %}active{% endif %}" href="{{ url_for('index', type='video') }}">🎬 Videos</a>
+  <a class="filter-chip {% if request.args.get('type')=='image' %}active{% endif %}" href="{{ url_for('index', type='image') }}">🖼️ Images</a>
+  <a class="filter-chip {% if request.args.get('type')=='file'  %}active{% endif %}" href="{{ url_for('index', type='file')  }}">📄 Files</a>
+</div>
+
+{% if items %}
+
+{# ── Separate media cards from slim rows ── #}
+{% set media_items = items | selectattr('type', 'in', ['video', 'image']) | list %}
+{% set row_items   = items | selectattr('type', 'in', ['link', 'file'])   | list %}
+
+{% if media_items %}
+<div class="grid mb-24">
+  {% for item in media_items %}{{ item_card(item) }}{% endfor %}
+</div>
+{% endif %}
+
+{% if row_items %}
+{% if media_items %}
+<div class="section-hd mb-16" style="border-left-color:var(--border);">
+  <h2 style="font-size:13px;color:var(--text-muted);">🔗 Links &amp; Files</h2>
+</div>
+{% endif %}
+<div class="link-file-list">
+  {% for item in row_items %}{{ item_card(item) }}{% endfor %}
+</div>
+{% endif %}
+
+{{ pagination(page, total_pages, url_for('index')) }}
+
+{% else %}
+<div class="empty-state">
+  <div class="icon">📭</div>
+  <h3>Nothing here yet</h3>
+  <p>Be the first to <a href="{{ url_for('upload') }}">upload something</a>.</p>
+</div>
+{% endif %}
+{% endblock %}

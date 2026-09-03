@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "macros.html" import item_card, pagination %}
+{% block title %}Search{% endblock %}
+{% block topbar_title %}🔍 Search{% endblock %}
+
+{% block content %}
+<div class="search-hero">
+  <h1>Search Everything</h1>
+  <form action="{{ url_for('search') }}" method="get" class="search-big">
+    <input type="text" name="q" value="{{ q }}" placeholder="Links, videos, files, images…" autofocus>
+    <button type="submit">Search</button>
+  </form>
+</div>
+
+{% if q %}
+<div class="filter-bar mb-16">
+  <span class="text-muted text-small" style="padding:5px 0;">Filter:</span>
+  <a class="filter-chip {% if not itype %}active{% endif %}" href="{{ url_for('search', q=q) }}">All</a>
+  <a class="filter-chip {% if itype=='link'  %}active{% endif %}" href="{{ url_for('search', q=q, type='link')  }}">🔗 Links</a>
+  <a class="filter-chip {% if itype=='video' %}active{% endif %}" href="{{ url_for('search', q=q, type='video') }}">🎬 Videos</a>
+  <a class="filter-chip {% if itype=='image' %}active{% endif %}" href="{{ url_for('search', q=q, type='image') }}">🖼️ Images</a>
+  <a class="filter-chip {% if itype=='file'  %}active{% endif %}" href="{{ url_for('search', q=q, type='file')  }}">📄 Files</a>
+</div>
+
+<div class="section-hd">
+  <h2>Results for "{{ q }}"</h2>
+  <span class="text-muted text-small">{{ total }} found</span>
+</div>
+
+{% if items %}
+{% set media_items = items | selectattr('type', 'in', ['video', 'image']) | list %}
+{% set row_items   = items | selectattr('type', 'in', ['link', 'file'])   | list %}
+{% if media_items %}
+<div class="grid mb-24">{% for item in media_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{% if row_items %}
+<div class="link-file-list">{% for item in row_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{{ pagination(page, total_pages, url_for('search') + '?q=' + (q|urlencode) + ('&type=' + itype if itype else '')) }}
+{% else %}
+<div class="empty-state">
+  <div class="icon">🔍</div>
+  <h3>No results for "{{ q }}"</h3>
+  <p>Try different keywords or <a href="{{ url_for('upload') }}">upload it yourself</a>.</p>
+</div>
+{% endif %}
+
+{% else %}
+<div class="section-hd mt-16"><h2>Popular Categories</h2></div>
+<div class="filter-bar">
+  {% for cat in nav_categories %}
+  <a class="filter-chip" href="{{ url_for('category', slug=cat.slug) }}">{{ cat.icon }} {{ cat.name }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

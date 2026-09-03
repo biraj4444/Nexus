@@ -1,0 +1,26 @@
+[
+  {
+    "item_id": "0ccdf12f53124de6aa9a925d",
+    "username": "Anonymous",
+    "message": "Hello",
+    "parent_id": null,
+    "created_at": "2026-08-31 10:09:35.419716",
+    "_id": "9b2df7c5c5e84e099a9163eb"
+  },
+  {
+    "item_id": "0ccdf12f53124de6aa9a925d",
+    "username": "Anonymous",
+    "message": "Tomorrow morning",
+    "parent_id": null,
+    "created_at": "2026-08-31 10:10:17.828876",
+    "_id": "87f9a6dc877a43638116410d"
+  },
+  {
+    "item_id": "f7a347edb13148ab9ec10262",
+    "username": "Anonymous",
+    "message": "😂😜🗻",
+    "parent_id": null,
+    "created_at": "2026-09-03 18:59:49.707745",
+    "_id": "b20ed2ca4511469892515437"
+  }
+]

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}NexusVault{% endblock %} — Universal Collection</title>
+  <meta name="description" content="{% block meta_desc %}NexusVault — Your universal open-source collection of links, videos, images and files.{% endblock %}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬡</text></svg>">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- Hamburger toggle (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Menu">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ─── Sidebar ─────────────────────────────────────────────────────────── -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <a class="logo-link" href="{{ url_for('index') }}">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">NexusVault</span>
+    </a>
+  </div>
+
+  <div class="sidebar-search">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="sideSearch" placeholder="Filter menu…" autocomplete="off">
+    </div>
+  </div>
+
+  <ul class="nav-items">
+    <li class="nav-section">Navigation</li>
+
+    <li class="nav-item {% if active=='home' %}active{% endif %}" data-label="home">
+      <a href="{{ url_for('index') }}">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+    </li>
+    <li class="nav-item {% if active=='new' %}active{% endif %}" data-label="new latest">
+      <a href="{{ url_for('new') }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        New Uploads
+      </a>
+    </li>
+    <li class="nav-item {% if active=='search' %}active{% endif %}" data-label="search find">
+      <a href="{{ url_for('search') }}">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search
+      </a>
+    </li>
+
+    <li class="nav-section">Categories</li>
+    {% for cat in nav_categories %}
+    <li class="nav-item {% if active=='cat-'+cat.slug %}active{% endif %}" data-label="{{ cat.name }}">
+      <a href="{{ url_for('category', slug=cat.slug) }}">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        {{ cat.name }}
+      </a>
+    </li>
+    {% endfor %}
+
+    <li class="nav-section">Other</li>
+    <li class="nav-item {% if active=='servers' %}active{% endif %}" data-label="servers zones regions">
+      <a href="{{ url_for('servers') }}">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        Servers
+      </a>
+    </li>
+  </ul>
+
+  <div class="sidebar-footer">
+    © {{ year }} NexusVault &mdash; Open Source
+  </div>
+</nav>
+
+<!-- ─── Main ──────────────────────────────────────────────────────────────── -->
+<div class="main">
+  <!-- Topbar -->
+  <header class="topbar">
+    <span class="topbar-title">{% block topbar_title %}NexusVault{% endblock %}</span>
+    <div class="topbar-search">
+      <form action="{{ url_for('search') }}" method="get">
+        <input type="text" name="q" placeholder="Search everything…" value="{{ request.args.get('q','') }}" autocomplete="off">
+        <button type="submit">Go</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flashes">
+      {% for cat, msg in messages %}
+      <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Page Content -->
+  <div class="page">
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+<!-- FAB upload button -->
+<a class="fab" href="{{ url_for('upload') }}" title="Upload / Add Content">
+  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</a>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose">✕</button>
+  <img id="lbImg" src="" alt="Preview">
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

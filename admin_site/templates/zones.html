@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Zones{% endblock %}
+{% block topbar_title %}Manage Zones / Servers{% endblock %}
+
+{% block content %}
+{% if error %}
+<div class="alert alert-err">⚠️ {{ error }}</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;">
+
+  <!-- Zone list -->
+  <div>
+    <div class="section-hd">
+      <h2>All Zones <span class="text-muted text-small">({{ zones|length }})</span></h2>
+    </div>
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Flag</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Country</th>
+          <th>Parent</th>
+          <th>Items</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for z in zones %}
+      <tr>
+        <td style="font-size:22px;text-align:center;">{{ z.flag_emoji }}</td>
+        <td>
+          <strong style="font-size:13px;">{{ z.name }}</strong>
+          {% if z.description %}<div class="sub text-muted text-small">{{ z.description[:40] }}</div>{% endif %}
+        </td>
+        <td><code style="font-size:11px;background:var(--bg-raised);padding:2px 7px;">{{ z.slug }}</code></td>
+        <td style="font-size:12px;color:var(--text-muted);">{{ z.country or '—' }}</td>
+        <td style="font-size:12px;color:var(--text-muted);">{{ z.parent_slug or '—' }}</td>
+        <td><span class="badge badge-orange">{{ counts.get(z.slug, 0) }}</span></td>
+        <td>
+          <form method="POST" data-confirm="Delete zone '{{ z.name }}'?">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="zone_id" value="{{ z._id }}">
+            <button type="submit" class="action-btn action-btn-delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- Create zone form -->
+  <div class="admin-form-card">
+    <div class="admin-form-header">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Create Zone / Server
+    </div>
+    <div class="admin-form-body">
+      <form method="POST">
+        <input type="hidden" name="action" value="create">
+        <div class="form-group">
+          <label>Zone Name *</label>
+          <input class="form-control" name="name" id="nameInput" placeholder="Guwahati" required>
+        </div>
+        <div class="form-group">
+          <label>Slug * (auto-generated)</label>
+          <input class="form-control" name="slug" id="slugInput" placeholder="india-guwahati" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Country / Region</label>
+            <input class="form-control" name="country" placeholder="India">
+          </div>
+          <div class="form-group">
+            <label>Flag Emoji</label>
+            <input class="form-control" name="flag_emoji" placeholder="🏙️" maxlength="8" value="🌐">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Parent Zone (optional)</label>
+          <select class="form-control" name="parent_slug">
+            <option value="">— None (top-level) —</option>
+            {% for z in zones %}
+            {% if not z.parent_slug %}
+            <option value="{{ z.slug }}">{{ z.flag_emoji }} {{ z.name }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input class="form-control" name="description" placeholder="Short description">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Zone</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

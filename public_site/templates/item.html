@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }}{% endblock %}
+{% block topbar_title %}Item Detail{% endblock %}
+
+{% block content %}
+<div class="detail-wrap">
+  <!-- ── Left: media + info + discussions ── -->
+  <div class="detail-main">
+
+    <!-- Media -->
+    <div class="detail-media">
+      {% if item.type == 'video' %}
+        {% set url = item.cloudinary_url or item.url or '' %}
+        {% if 'youtube.com' in url or 'youtu.be' in url %}
+          {% set vid_id = url.split('v=')[-1].split('&')[0] if 'v=' in url else url.split('/')[-1] %}
+          <iframe src="https://www.youtube.com/embed/{{ vid_id }}" allowfullscreen></iframe>
+        {% elif url.endswith('.mp4') or 'cloudinary' in url %}
+          <video controls>
+            <source src="{{ url }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        {% else %}
+          <div class="detail-media-placeholder">🎬<small style="font-size:14px;color:var(--text-muted);">Video — <a href="{{ url }}" target="_blank">Open Link</a></small></div>
+        {% endif %}
+
+      {% elif item.type == 'image' %}
+        {% set url = item.cloudinary_url or item.url or item.thumbnail_url or '' %}
+        {% if url %}
+          <img src="{{ url }}" alt="{{ item.title }}" class="img-view" style="cursor:zoom-in;">
+        {% else %}
+          <div class="detail-media-placeholder">🖼️</div>
+        {% endif %}
+
+      {% elif item.type == 'link' %}
+        {% if item.thumbnail_url %}
+          <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}">
+        {% else %}
+          <div class="detail-media-placeholder">
+            🔗
+            <small style="font-size:13px;color:var(--text-muted);">External Link</small>
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="detail-media-placeholder">
+          📄
+          <small style="font-size:13px;color:var(--text-muted);">{{ item.type|title }} File</small>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="detail-info">
+      <h1>{{ item.title }}</h1>
+      <div class="detail-meta">
+        <span class="badge" style="background:{% if item.type=='link' %}#1a73e8{% elif item.type=='video' %}#e53935{% elif item.type=='image' %}#4caf50{% else %}#ff9800{% endif %};color:#fff;">{{ item.type|upper }}</span>
+        {% if category %}
+        <span class="badge" style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-sec);">{{ category.icon }} {{ category.name }}</span>
+        {% endif %}
+        {% if zone %}
+        <span class="badge" style="background:var(--bg-raised);border:1px solid var(--border);color:var(--text-sec);">{{ zone.flag_emoji }} {{ zone.name }}</span>
+        {% endif %}
+        <span class="text-muted text-small">👁 {{ item.views or 0 }} views</span>
+        <span class="text-muted text-small">⬇ {{ item.downloads or 0 }} downloads</span>
+        <span class="text-muted text-small">by {{ item.uploader_name or 'Unknown' }}</span>
+        {% if item.source_type == 'admin' %}
+        <span class="badge" style="background:#1a73e8;color:#fff;">OFFICIAL</span>
+        {% else %}
+        <span class="badge" style="background:#34a853;color:#fff;">PUBLIC</span>
+        {% endif %}
+      </div>
+      {% if item.description %}
+      <p class="detail-desc">{{ item.description }}</p>
+      {% endif %}
+      {% if item.tags %}
+      <div class="detail-tags">
+        {% for tag in item.tags %}
+        <a class="tag" href="{{ url_for('search', q=tag) }}">{{ tag }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="detail-actions">
+      {% if item.type == 'link' %}
+      <a class="btn btn-primary" href="{{ item.url }}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open Link
+      </a>
+      {% else %}
+      <a class="btn btn-primary" href="{{ url_for('download', item_id=item._id) }}">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </a>
+      {% endif %}
+      <button class="btn btn-outline copy-link-btn" data-url="{{ request.url }}">
+        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy Link
+      </button>
+      {% if item.url %}
+      <a class="btn btn-outline" href="{{ item.url }}" target="_blank" rel="noopener">
+        Direct URL ↗
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- URL Box for links -->
+    {% if item.type == 'link' and item.url %}
+    <div class="link-box">
+      <a href="{{ item.url }}" target="_blank">{{ item.url }}</a>
+      <a class="btn btn-primary" href="{{ item.url }}" target="_blank" rel="noopener" style="font-size:12px;padding:6px 14px;">Visit ↗</a>
+    </div>
+    {% endif %}
+
+    <!-- Discussions -->
+    <div class="disc-section" id="disc-section">
+      <h3>💬 Discussions ({{ discussions|length }})</h3>
+
+      <div class="disc-form">
+        <form method="POST" action="{{ url_for('add_discussion', item_id=item._id) }}">
+          <div class="row">
+            <input name="username" placeholder="Your name (optional)" maxlength="50">
+            <textarea name="message" placeholder="Share your thoughts, ask a question, or leave a review…" required style="flex:1;min-height:70px;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="padding:8px 20px;">Post Comment</button>
+        </form>
+      </div>
+
+      <div class="disc-list">
+        {% for d in discussions %}
+        <div class="disc-item" id="disc-{{ d._id }}">
+          <div class="disc-header">
+            <span class="disc-user">{{ d.username or 'Anonymous' }}</span>
+            <span class="disc-time">{{ d.created_at[:10] if d.created_at else '' }}</span>
+          </div>
+          <div class="disc-msg">{{ d.message }}</div>
+          <div class="disc-actions">
+            <button class="disc-reply-btn" data-id="{{ d._id }}">↩ Reply</button>
+          </div>
+
+          <!-- Reply form (hidden) -->
+          <div id="reply-form-{{ d._id }}" style="display:none;margin-top:10px;">
+            <form method="POST" action="{{ url_for('add_discussion', item_id=item._id) }}">
+              <input type="hidden" name="parent_id" value="{{ d._id }}">
+              <div class="disc-form" style="padding:10px;">
+                <div class="row">
+                  <input name="username" placeholder="Your name" maxlength="50" style="flex:0 0 150px;">
+                  <textarea name="message" placeholder="Write a reply…" required style="flex:1;min-height:60px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline" style="padding:6px 14px;font-size:12px;margin-top:8px;">Reply</button>
+              </div>
+            </form>
+          </div>
+
+          {% if d.replies %}
+          <div class="disc-replies">
+            {% for r in d.replies %}
+            <div class="disc-reply">
+              <div class="disc-header">
+                <span class="disc-user">{{ r.username or 'Anonymous' }}</span>
+                <span class="disc-time">{{ r.created_at[:10] if r.created_at else '' }}</span>
+              </div>
+              <div class="disc-msg">{{ r.message }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="empty-state" style="padding:30px;">
+          <div class="icon">💬</div>
+          <h3>No discussions yet</h3>
+          <p>Be the first to comment!</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div><!-- /.detail-main -->
+
+  <!-- ── Right: related ── -->
+  <div class="detail-sidebar">
+    <div class="section-hd" style="margin-bottom:12px;">
+      <h2 style="font-size:14px;">Related</h2>
+    </div>
+    {% if related %}
+    <div class="related-list">
+      {% for r in related %}
+      <a class="related-item" href="{{ url_for('item_detail', item_id=r._id) }}" style="text-decoration:none;">
+        <div class="related-thumb">
+          {% if r.thumbnail_url %}
+          <img src="{{ r.thumbnail_url }}" alt="{{ r.title }}" loading="lazy">
+          {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;background:#0a0a0a;">
+            {% if r.type=='video' %}🎬{% elif r.type=='image' %}🖼️{% elif r.type=='link' %}🔗{% else %}📄{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        <div class="related-info">
+          <div class="title">{{ r.title }}</div>
+          <div class="meta">{{ r.type }} · {{ r.views or 0 }} views</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted text-small">No related items found.</p>
+    {% endif %}
+
+    <!-- Details box -->
+    <div style="margin-top:24px;background:var(--bg-card);border:1px solid var(--border);padding:16px;">
+      <div class="section-hd" style="margin-bottom:12px;"><h2 style="font-size:13px;">Details</h2></div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse;">
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Type</td><td style="text-align:right;">{{ item.type|title }}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Source</td><td style="text-align:right;">{{ item.source_type|title }}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Zone</td><td style="text-align:right;">{% if zone %}{{ zone.flag_emoji }} {{ zone.name }}{% else %}—{% endif %}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Uploader</td><td style="text-align:right;">{{ item.uploader_name or '—' }}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Added</td><td style="text-align:right;">{{ item.created_at[:10] if item.created_at else '—' }}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Views</td><td style="text-align:right;">{{ item.views or 0 }}</td></tr>
+        <tr><td style="padding:5px 0;color:var(--text-muted);">Downloads</td><td style="text-align:right;">{{ item.downloads or 0 }}</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

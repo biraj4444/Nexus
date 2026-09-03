@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import item_card, pagination %}
+{% block title %}New Uploads{% endblock %}
+{% block topbar_title %}🆕 New Uploads{% endblock %}
+
+{% block content %}
+<div class="section-hd">
+  <h2>🆕 New Uploads</h2>
+  <span class="text-muted text-small">{{ total }} total — Page {{ page }} of {{ total_pages }}</span>
+</div>
+
+{% if items %}
+{% set media_items = items | selectattr('type', 'in', ['video', 'image']) | list %}
+{% set row_items   = items | selectattr('type', 'in', ['link', 'file'])   | list %}
+
+{% if media_items %}
+<div class="grid mb-24">{% for item in media_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{% if row_items %}
+<div class="link-file-list">{% for item in row_items %}{{ item_card(item) }}{% endfor %}</div>
+{% endif %}
+{{ pagination(page, total_pages, url_for('new')) }}
+{% else %}
+<div class="empty-state">
+  <div class="icon">📭</div>
+  <h3>Nothing here yet</h3>
+  <p><a href="{{ url_for('upload') }}">Upload the first item</a></p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Servers & Zones{% endblock %}
+{% block topbar_title %}🌐 Regional Servers{% endblock %}
+
+{% block content %}
+<div class="section-hd">
+  <h2>🌐 Regional Servers</h2>
+  <span class="text-muted text-small">Browse content by location</span>
+</div>
+<p class="text-muted mb-24" style="font-size:13px;">
+  NexusVault is organised into regional zones. Choose your server to browse locally curated content.
+</p>
+
+{% for zone in top_zones %}
+<div class="server-grid" style="margin-bottom:0;">
+  <div class="server-card" style="grid-column: 1/-1; background:transparent; border:none; padding:0 0 8px; border-bottom:1px solid var(--border); margin-bottom:16px;">
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">{{ zone.flag_emoji }} {{ zone.name }} Region</h3>
+  </div>
+</div>
+
+<div class="server-grid">
+  <!-- Parent zone card -->
+  <a href="{{ url_for('zone', slug=zone.slug) }}" class="server-card" style="text-decoration:none;">
+    <div class="server-flag">{{ zone.flag_emoji }}</div>
+    <div class="server-name">{{ zone.name }}</div>
+    <div class="server-desc">{{ zone.description or '' }}</div>
+    <div class="server-count">{{ zone_counts.get(zone.slug, 0) }}</div>
+    <div class="server-count-lbl">Items</div>
+  </a>
+
+  <!-- Sub zones -->
+  {% for sub in sub_zones.get(zone.slug, []) %}
+  <a href="{{ url_for('zone', slug=sub.slug) }}" class="server-card" style="text-decoration:none;">
+    <div class="server-flag">{{ sub.flag_emoji }}</div>
+    <div class="server-name">{{ sub.name }}</div>
+    <div class="server-desc">{{ sub.description or '' }}</div>
+    <div class="server-count">{{ zone_counts.get(sub.slug, 0) }}</div>
+    <div class="server-count-lbl">Items</div>
+  </a>
+  {% endfor %}
+</div>
+
+<div style="margin-bottom:32px;"></div>
+{% endfor %}
+{% endblock %}
